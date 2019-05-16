@@ -24,7 +24,9 @@ function make_m3u8(){
 
 }
 
-var indexPage = '';
+var indexPage = fs.readFileSync('static/index.html','utf8');
+var indexJs   = fs.readFileSync('static/video.min.js','utf8');
+var indexCss  = fs.readFileSync('static/video-js.min.css','utf8');
 
 setInterval(()=>{
     if(queue.length>4){
@@ -88,31 +90,11 @@ var server = http.createServer((request,response)=>{
             
         }else if(request.url == '/'){
             //index request
-            if(indexPage.length==0){
-                fs.readFile('index.html', 'utf8', (err,data)=>{
-                    if(err){
-                        response.writeHead(404);
-                        response.end();
-                        console.log('invalide request: '+request.url);
-                    }else{
-                        response.setHeader('Content-Type','text/html');
-                        response.setHeader('Server','Simple NodeJS Server');
-                        response.writeHead(200);
-                        response.end(data);
-                        indexPage = data;
-                        console.log("index!");
-
-                    }
-                });
-            }else{
-                response.setHeader('Content-Type','text/html');
-                response.setHeader('Server','Simple NodeJS Server');
-                response.writeHead(200);
-                response.end(indexPage);
-                console.log("index!");
-            }
-
-
+            response.setHeader('Content-Type','text/html');
+            response.setHeader('Server','Simple NodeJS Server');
+            response.writeHead(200);
+            response.end(indexPage);
+            console.log("index!");
         }else if(request.url == '/list.m3u8'){
             //m3u8
             let ml = make_m3u8();
@@ -121,6 +103,16 @@ var server = http.createServer((request,response)=>{
             response.writeHead(200);
             response.end(ml);
             console.log("m3u8!");
+        }else if(request.url == "/video.min.js"){
+            response.setHeader('Content-Type','text/javascript');
+            response.setHeader('Server','Simple NodeJS Server');
+            response.writeHead(200);
+            response.end(indexJs);
+        }else if(request.url == '/video-js.min.css'){
+            response.setHeader('Content-Type','text/css');
+            response.setHeader('Server','Simple NodeJS Server');
+            response.writeHead(200);
+            response.end(indexCss);
         }
 
     });
